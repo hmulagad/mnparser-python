@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 #!/opt/support/python37/bin/python3
+=======
+>>>>>>> origin/master
 #############################################
 ## Author: Harikishan Mulagada
 ## Role  : Staff Engineer SteelCentral
@@ -14,10 +17,17 @@ import time
 import re
 import sys
 import shutil
+<<<<<<< HEAD
 import datetime
 from bokeh.plotting import figure, output_file, save
 from bokeh.layouts import column
 from bokeh.models.formatters import DatetimeTickFormatter
+=======
+import matplotlib as mpl
+mpl.use('Agg')
+import matplotlib.pyplot as plt
+import datetime
+>>>>>>> origin/master
 
 start = time.time()
 
@@ -37,6 +47,7 @@ def unzip(filepath):
     if(filepath.endswith('.zip')):
         zfile = zipfile.ZipFile(filepath)
         zfile.extractall()
+<<<<<<< HEAD
         try:
             for file_name in zfile.namelist():
                 info = zfile.getinfo(file_name)
@@ -48,10 +59,26 @@ def unzip(filepath):
         zfile.close()
         unix_win_flag = 0
         
+=======
+
+	try:
+		for file_name in zfile.namelist():
+			info = zfile.getinfo(file_name)
+			if (float(info.file_size)/1000000)>10.0:
+				filesizedict.update({info.filename:float(info.file_size)/1000000})			
+
+	except Exception as e:
+		print(e)
+
+        zfile.close()
+	unix_win_flag = 0
+
+>>>>>>> origin/master
     else:
         tar = tarfile.open(filepath)
         tar.extractall()
 
+<<<<<<< HEAD
         try:
             for info in tar.getmembers():
                 if (float(info.size)/1000000)>10.0:
@@ -79,6 +106,34 @@ def unzip(filepath):
                 workdir = os.path.abspath(filename.split('.tar')[0])
             else:
                 workdir = os.path.join(os.path.dirname(filepath),filename[filename.index('rpm_diag'):].split('.tar')[0]).replace('rpm_diag-','rpm_diag.').replace('-MN-','.')
+=======
+	try:
+		for info in tar.getmembers():
+			if (float(info.size)/1000000)>10.0:
+				filesizedict.update({info.name:float(info.size)/1000000})
+				print(info.name)
+				print(float(info.size)/1000000)
+	except Exception as e:
+		print(e)
+
+        tar.close()
+	unix_win_flag = 1
+
+    print('Finished unzipping the bundle...')
+
+    try:
+	if filename.find('.zip')!=-1:
+		if filename.split('.zip')[0] in  os.listdir(extractpath):
+			workdir = os.path.abspath(filename.split('.zip')[0])
+		else:
+			workdir = os.path.join(os.path.dirname(filepath),filename[filename.index('rpm_diag'):].split('.zip')[0])
+
+	elif filename.find('.tar')!=-1:
+		if filename.split('.tar')[0] in os.listdir(extractpath):
+			workdir = os.path.abspath(filename.split('.tar')[0])
+		else:
+			workdir = os.path.join(os.path.dirname(filepath),filename[filename.index('rpm_diag'):].split('.tar')[0]).replace('rpm_diag-','rpm_diag.').replace('-MN-','.')
+>>>>>>> origin/master
 
 ##    	if filename.split('.zip')[0] in  os.listdir(extractpath):
 ##        	workdir = os.path.abspath(filename.split('.zip')[0])
@@ -101,7 +156,11 @@ def cleanup(filepath,filename,errorandwarn,cpuplot):
     else:
 	##extrctdir = os.path.basename(filepath).split('.tar')[0]
 	##print(os.path.abspath(os.path.basename(filepath).split('.tar')[0]).replace('rpm_diag-','rpm_diag.').replace('-MN-','.'))
+<<<<<<< HEAD
         extrctdir = os.path.abspath(os.path.basename(filepath).split('.tar')[0]).replace('rpm_diag-','rpm_diag.').replace('-MN-','.')
+=======
+	extrctdir = os.path.abspath(os.path.basename(filepath).split('.tar')[0]).replace('rpm_diag-','rpm_diag.').replace('-MN-','.')
+>>>>>>> origin/master
 
     cwd = os.getcwd()
 ##    cwd = os.chdir(os.path.dirname(os.path.abspath(filepath)))
@@ -114,8 +173,13 @@ def cleanup(filepath,filename,errorandwarn,cpuplot):
 
 
     for fname in os.listdir(cwd):
+<<<<<<< HEAD
         if ((fname.endswith('.txt') or fname.endswith('.html')) and (fname.find(filename)!=-1 or fname.find(errorandwarn)!=-1 or fname.find(cpuplot)!=-1)):
             print('Deleting file {0}'.format(fname))
+=======
+        if ((fname.endswith('.txt') or fname.endswith('.png')) and (fname.find(filename)!=-1 or fname.find(errorandwarn)!=-1 or fname.find(cpuplot)!=-1)):
+	    print('Deleting file {0}'.format(fname))
+>>>>>>> origin/master
             os.remove(fname)
 
 
@@ -129,14 +193,22 @@ def setdetails4(argv):
                                 errorandwarn = str(casenum)+'_'+str(argv[2])+'_errorsandwarns.txt'
                                 filename = str(casenum)+'_'+str(argv[2])+'_agentdetails.txt'
                                 title = str('AIX_logs_'+str(casenum)+'_'+str(argv[2])).rstrip()
+<<<<<<< HEAD
                                 cpuplot = str(casenum)+'_'+str(argv[2])+'_cpuplot.html'
+=======
+				cpuplot = str(casenum)+'_'+str(argv[2])+'_cpuplot.png'
+>>>>>>> origin/master
                         else:
                                 path = argv[0]
                                 casenum = argv[1]
                                 errorandwarn = str(casenum)+'_errorsandwarns.txt'
                                 filename = str(casenum)+'_agentdetails.txt'
                                 title = str('AIX_logs_'+str(casenum)).rstrip()
+<<<<<<< HEAD
                                 cpuplot = str(casenum)+'_'+str(argv[2])+'_cpuplot.html'
+=======
+				cpuplot = str(casenum)+'_'+str(argv[2])+'_cpuplot.png'
+>>>>>>> origin/master
                 else:
                         print('\nCase number should be numeric only')
                         print('Usage: python script_name path_to_diagbundle case_number <optional Desc>')
@@ -156,8 +228,13 @@ def setdetails3(argv):
                         errorandwarn = str(casenum)+'_errorsandwarns.txt'
                         filename = str(casenum)+'_agentdetails.txt'
                         title = str('AIX_logs_'+str(casenum)).rstrip()
+<<<<<<< HEAD
                         cpuplot = str(casenum)+'_cpuplot.html'
                 else:			
+=======
+			cpuplot = str(casenum)+'_cpuplot.png'
+                else:
+>>>>>>> origin/master
                         print('\nCase number should be numeric only')
                         print('Usage: python script_name path_to_diagbundle case_number <optional Desc>')
                         exit()
@@ -168,6 +245,7 @@ def setdetails3(argv):
         return path,casenum,filename,errorandwarn,title,cpuplot
 
 ##Function to generate weblinks for output files
+<<<<<<< HEAD
 def weblinks(WORK_DIR,path,filename,errorandwarn,cpuplot):
     try:
         baseURL = 'http://support.nbttech.com/'
@@ -216,6 +294,58 @@ def dsaversion(WORK_DIR):
 
 
         return str(ver),ashost.strip()
+=======
+def weblinks(path,filename,errorandwarn,cpuplot):
+	try:
+        	baseURL = 'http://support.nbttech.com/'
+        	sysURL = ''
+        	errURL = ''
+		pltURL = ''
+
+        	tmpPath = str(os.path.dirname(path))[str(os.path.dirname(path)).index('data/'):]
+
+        	sysURL = baseURL+tmpPath+'/'+filename
+        	errURL = baseURL+tmpPath+'/'+errorandwarn
+		pltURL = baseURL+tmpPath+'/'+cpuplot
+        	logURL = baseURL+tmpPath
+
+        	print('Creating Web Link to files...\n')
+        	print('*****************************\n')
+        	print('    WEB LINKS                \n')
+
+        	print('Browse Logs: '+logURL+'\n')
+        	print('Agent Details: '+sysURL+'\n')
+        	print('Errors log: '+errURL+'\n')
+		print('CPU Plot: '+pltURL+'\n')
+
+        	print('\n*****************************\n')
+	except Exception as e:
+		print('Try passing full path to bundle instead on ./ or cd in /u/support/bin and run the script for weblinks')
+
+def dsaversion(WORK_DIR):
+	ver = ''
+	ashost = ''
+	try:
+    		FILE_TO_READ = os.path.abspath(WORK_DIR)+'/mn/data/dsa.xml'
+		fobj = open(FILE_TO_READ)
+
+		for line in fobj:
+			if line.find('<AgentVersion>')!=-1:
+				match = re.findall(r'[.\d]',line)
+			if line.find('<Attribute name="AnalysisServerHost" value=')!=-1:
+				ashost = line.split('value="')[1].replace('"/>','')
+
+		for x in match:
+			ver = ver+x
+
+		fobj.close()
+
+	except Exception as e:
+		print(e)
+
+
+	return str(ver),ashost.strip()
+>>>>>>> origin/master
 
 def hostname(WORK_DIR):
 	host_name = ''
@@ -360,6 +490,7 @@ def apptraces(WORK_DIR,UNIX_WIN_FLAG):
 	return count		
 
 def netstat(WORK_DIR):
+<<<<<<< HEAD
         time_wait = 0
         close_wait = 0
         fin_wait = 0
@@ -384,6 +515,32 @@ def netstat(WORK_DIR):
             print('Missing netstat_an file from bundle...')
 
         return time_wait,close_wait,fin_wait            
+=======
+	time_wait = 0
+	close_wait = 0
+	fin_wait = 0
+
+	try:
+		FILE_TO_READ = os.path.abspath(WORK_DIR)+'/commands/netstat_an'
+		fobj = open(FILE_TO_READ)
+		
+		for x in fobj:
+			if(x.find('TIME_WAIT') and x.find('tcp')):
+				time_wait+=1
+        		else:
+            			if(x.find('CLOSE_WAIT') and x.find('tcp')):
+                			close_wait+=1
+            			else:
+                			if(x.find('FIN_WAIT') and x.find('tcp')):
+                    				fin_wait+=1
+
+		fobj.close()
+
+	except Exception as e:
+		print('Missing netstat_an file from bundle...')
+
+	return time_wait,close_wait,fin_wait		
+>>>>>>> origin/master
 
 def agentid(WORK_DIR):
 	agent_id = ''
@@ -553,12 +710,21 @@ def dotnetcoreinfo(WORK_DIR):
 	return dotnetcoreversion.strip()
 
 def cpustatsplot(WORK_DIR,casenum,cpuplot):
+<<<<<<< HEAD
         cpu_values = {}
         plt_name = cpuplot
+=======
+        line_list = []
+        dates = []
+        values = []
+	##plt_name = '_cpuplot.png'
+	plt_name = cpuplot
+>>>>>>> origin/master
 
         try:
                 FILE_TO_READ = os.path.abspath(WORK_DIR)+'/mn/log/cpu-stats.txt'
                 fobj = open(FILE_TO_READ)
+<<<<<<< HEAD
                 prog = re.compile('^(\d{2}\/\d{2}\/\d{4}[ ]\d{2}:\d{2}:\d{2}.\d{3}).*[ ](core_pct:)[ ]([0-9]+.[0-9]+)')
 
                 for lines in fobj:
@@ -590,10 +756,35 @@ def cpustatsplot(WORK_DIR,casenum,cpuplot):
 
                 save(p)
   
+=======
+
+                for lines in fobj:
+                        line_list = lines.split(' ')
+                        ##print(datetime.datetime(line_list[0])+' '+line_list[1]+':'+line_list[11])
+                        ##datetime_obj = datetime.strptime(line_list[0]+' '+line_list[1], '%m/%d/%Y %H:%M:%S.%f')
+                        
+			##date_obj = datetime.datetime.strptime(line_list[0]+' '+str(line_list[1]).split('.')[0], '%m/%d/%Y %H:%M:%S')
+			##date_obj = datetime.datetime.strptime(line_list[0], '%m/%d/%Y')
+			##date_obj = datetime.datetime.strptime(line_list[0],'%m/%d/%Y')
+			##dates.append(date_obj)
+                        values.append(float(line_list[11]))
+
+                fobj.close()
+
+		plt.xlabel('Time',fontsize=10)
+		plt.ylabel('CPU %',fontsize=10)
+		plt.title('DSA CPU usage')
+	
+		plt.plot(values)
+		plt.xticks([])
+		plt.savefig(plt_name)
+
+>>>>>>> origin/master
         except Exception as e:
                 print(e)
 
 def errorsandwarns(WORK_DIR,errorandwarn):
+<<<<<<< HEAD
     os.chdir(WORK_DIR)
     folders_to_read = ['/mn/log/','/mn/temp/']
     lookup_str = ['FATAL','ERROR','WARN']
@@ -618,6 +809,30 @@ def errorsandwarns(WORK_DIR,errorandwarn):
                     
     except Exception as e:
         print(e)
+=======
+	folders_to_read = ['/mn/log/','/mn/temp/']
+	lookup_str = ['FATAL','ERROR','WARN']
+	fwrite = open(errorandwarn,'a')
+	try:
+		for x in range(len(folders_to_read)):
+			cur_folder = (os.path.abspath(WORK_DIR)+folders_to_read[x])
+			file_list = (os.listdir(cur_folder))
+
+			for x in file_list:
+				if os.path.isdir((os.path.abspath(cur_folder+x))):
+					print('Skip reading directory ',x)
+				else:
+					print('Reading file ',os.path.abspath(cur_folder+x))
+					fwrite.write('\n***** {0} *****\n\n'.format(x))
+					fobj = open(os.path.abspath(cur_folder+x))
+					for lines in fobj:
+						for string in range(len(lookup_str)):
+							if lookup_str[string] in lines:
+								fwrite.write(lines)						
+					fobj.close()
+	except Exception as e:
+		print(e)
+>>>>>>> origin/master
 
 ##Main function
 def main():
@@ -647,6 +862,10 @@ def main():
 
         cleanup(path,filename,errorandwarn,cpuplot)
         WORK_DIR,UNIX_WIN_FLAG,FILE_SIZE_DICT = unzip(path)
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/master
     except Exception as e:
         print(e)
 
@@ -671,6 +890,7 @@ def main():
     errorsandwarns(WORK_DIR,errorandwarn)
     cpustatsplot(WORK_DIR,casenum,cpuplot)    
 
+<<<<<<< HEAD
     #To create output files in extracted directory
     os.chdir(WORK_DIR)
 
@@ -688,10 +908,28 @@ def main():
             fwrite.write('	{0}'.format(TAGS[x]))
             
         fwrite.close()
+=======
+    try:
+    	fwrite = open(filename,'a')
+    	fwrite.write('****** Agent Details ******\n')
+    	fwrite.write('Agent Name: {0}\n'.format(HOST_NAME))
+        fwrite.write('Agent FQDN: {0}\n'.format(FQDN))
+    	fwrite.write('Agent IP: {0}\n'.format(IP_ADDR))
+    	fwrite.write('Agent Version: {0}\n'.format(DSA_VER))
+    	fwrite.write('Agent IID: {0}'.format(AGENT_ID))
+    	fwrite.write('Analysis Server Host: {0}\n'.format(AS_HOST))
+    	fwrite.write('Agent Tags:\n')
+        for x in range(len(TAGS)):
+		fwrite.write('	{0}'.format(TAGS[x]))
+
+	fwrite.close()
+
+>>>>>>> origin/master
         fwrite = open(filename,'a')
         fwrite.write('\n***** Found {0} files with size more than 10MB.\n'.format(len(FILE_SIZE_DICT)))
         fwrite.close()
 
+<<<<<<< HEAD
         fwrite = open(filename,'a')
         try:
             if (DOTNETCOREINFO!=''):
@@ -779,6 +1017,95 @@ def main():
         print(e)
 	
     weblinks(WORK_DIR,path,filename,errorandwarn,cpuplot)
+=======
+	fwrite = open(filename,'a')
+	try:
+		if (DOTNETCOREINFO!=''):
+			fwrite.write('\n***** Dotnet Core Details *****\n')
+			fwrite.write(DOTNETCOREINFO+'\n')
+
+		if (DOTNETCOREINFO.split(':')[1])>=3.0:
+			fwrite.write('\nIf customer is not running agent version greater than equal to 10.21.7, they will run in to APMDEV-2866\n')
+			fwrite.write('Please look into the JIRA bug which prevents instrumentation older dotnet core applications when dotnetcore 3.x is installed\n')
+
+	except Exception as e:
+		print(e)
+
+	fwrite.close()
+
+	fwrite = open(filename,'a')
+    	fwrite.write('\n***** Instrumentation Details *****\n')
+    	fwrite.write('RPICTRL Status: {0}\n'.format(RPICTRL_STATUS))
+    	fwrite.write('RPICTRL Java Status: {0}\n'.format(RPICTRL_JAVA_INFO))
+    	fwrite.write('RPICTRL .NET Status: {0}\n'.format(RPICTRL_NET_INFO))
+    	fwrite.write('RPICTRL .NET Core Status: {0}\n'.format(RPICTRL_NETCORE_INFO))
+    	fwrite.write('Process details:\n')
+	fwrite.close()
+
+	processdetails(WORK_DIR,filename)
+
+	fwrite = open(filename,'a')
+	if VALIDATE_DOTNET_INFO_PERMS > 0:
+		fwrite.write('\n****** Validate DotNet Install information *****\n')
+		fwrite.write('Read/Execute permission errors {0}\n'.format(VALIDATE_DOTNET_INFO_PERMS))
+		fwrite.write('Look into ValidateDotNetInstall log for more details\n\n')
+
+	fwrite.close()
+
+	fwrite = open(filename,'a')
+	if APPTRACES>0:
+		fwrite.write('***** Found at least {0} apptraces on the agent\n'.format(APPTRACES))
+	else:
+		fwrite.write('***** Found no apptraces on the agent or missing details from bundle\n')
+
+    	fwrite.write('\n****** Configuration and other details ******\n')
+    	fwrite.write('Available Configuration list:\n')
+	for x in range(len(CONFIGS)):
+		fwrite.write('		  {0}\n'.format(CONFIGS[x]))
+
+    	fwrite.write('\nEnvironment Variables:\n')
+	for x in range(len(ENV_VAR)):
+		fwrite.write('		{0}'.format(ENV_VAR[x]))
+    
+    	fwrite.write('\n***** Netstat details *****\n')
+    	fwrite.write('TIME_WAITs: {0}\n'.format(TIME_WAIT))
+    	fwrite.write('CLOSE_WAITs: {0}\n'.format(CLOSE_WAIT))
+    	fwrite.write('FIN_WAITs: {0}\n'.format(FIN_WAIT))
+ 
+	fwrite.close()
+ 
+	fwrite = open(filename,'a')
+	fwrite.write('\n***** LAST CONNECTION STATUS *****\n')
+	fwrite.write(CONNECTION_STATUS)
+	fwrite.close()
+
+	if len(FILE_SIZE_DICT)>0:
+		fwrite = open(filename,'a')
+		fwrite.write('\n\n***** List of logs with size greater than 10MB ******\n')
+		for key,value in FILE_SIZE_DICT.items():
+			fwrite.write('{0} - {1} MB\n'.format(key,value))
+		fwrite.close()
+
+	if len(HS_ERR_PID_LOGS)>0:
+		fwrite = open(filename,'a')
+		fwrite.write('\n***** Found hs_err_pid logs *****\n')
+		fwrite.write('Found {0} hs_err_pid logs.\n'.format(len(HS_ERR_PID_LOGS)))
+		fwrite.write('Please take a look which process coredumped\n')
+		fwrite.write('Please take a look at _errorsandwarns.txt for list of files and creation date\n')
+		fwrite.close()
+
+		fwrite = open(errorandwarn,'a')
+		fwrite.write('\n***** List of hs_err_pid files *****\n')
+		for key,value in HS_ERR_PID_LOGS.items():
+			fwrite.write('{0} - {1}\n'.format(key,value))
+
+		fwrite.close()
+	
+    except Exception as e:
+	print(e)
+	
+    weblinks(path,filename,errorandwarn,cpuplot)
+>>>>>>> origin/master
 
     end = time.time()
 
