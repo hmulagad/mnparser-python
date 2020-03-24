@@ -56,8 +56,8 @@ def unzip(filepath):
             for info in tar.getmembers():
                 if (float(info.size)/1000000)>10.0:
                     filesizedict.update({info.name:float(info.size)/1000000})
-                    print(info.name)
-                    print(float(info.size)/1000000)
+                    #print(info.name)
+                    #print(float(info.size)/1000000)
 
         except Exception as e:
             print(e)
@@ -734,9 +734,9 @@ def main():
                 fwrite.write('\n***** Dotnet Core Details *****\n')
                 fwrite.write(DOTNETCOREINFO+'\n')
 
-            if float(DOTNETCOREINFO.split(':')[1])>=3.0:
+            if (re.match('^(3.\d+)',(DOTNETCOREINFO.split(':')[1].strip())) is not None) :
                 fwrite.write('\nIf customer is not running agent version greater than equal to 10.21.7, they will run in to APMDEV-2866\n')
-                fwrite.write('Please look into the JIRA bug which prevents instrumentation older dotnet core applications when dotnetcore 3.x is installed\n')
+                fwrite.write('Please look into the JIRA bug which prevents instrumentation of older dotnet core applications when dotnetcore 3.x is installed\n')
 
         except Exception as e:
            print(e)
