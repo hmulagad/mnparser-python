@@ -377,14 +377,13 @@ def netstat(WORK_DIR):
                 fobj = open(FILE_TO_READ)
                 
                 for x in fobj:
-                        if(x.find('TIME_WAIT') and x.find('tcp')):
-                                time_wait+=1
-                        else:
-                                if(x.find('CLOSE_WAIT') and x.find('tcp')):
-                                        close_wait+=1
-                                else:
-                                        if(x.find('FIN_WAIT') and x.find('tcp')):
-                                                fin_wait+=1
+                    if ('tcp' in x):
+                        if('TIME_WAIT' in x):
+                            time_wait+=1
+                        elif('CLOSE_WAIT' in x):
+                            close_wait+=1
+                        elif('FIN_WAIT' in x):
+                            fin_wait+=1
 
                 fobj.close()
 
