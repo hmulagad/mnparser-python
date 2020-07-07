@@ -422,6 +422,39 @@ def agenttags(WORK_DIR):
 
 	return tags
 
+def agentos(WORK_DIR):
+	osname = ''
+	try:
+		if (os.path.exists(os.path.abspath(WORK_DIR)+'/OS_specific_files/wmi_OS.txt')):
+			FILE_TO_READ = os.path.abspath(WORK_DIR)+'/OS_specific_files/wmi_OS.txt'
+			fobj = open(FILE_TO_READ)
+			for line in fobj:
+				if line.find('Instance:')!=-1:
+					osname = ((line.split('Instance:')[1]).split('|')[0]).strip()
+		elif (os.path.exists(os.path.abspath(WORK_DIR)+'/commands/uname_a')):
+			FILE_TO_READ = os.path.abspath(WORK_DIR)+'/commands/uname_a'
+			fobj = open(FILE_TO_READ)
+			for line in fobj:
+				tmp = line.split(' ')
+			osname = tmp[0]+' '+tmp[2]+' '+tmp[3]
+	except Exception as e:
+		print('Missing OS details file from bundle...')
+
+	return osname
+
+def agenttimezone(WORK_DIR):
+	timezone = ''
+	try:
+		FILE_TO_READ = os.path.abspath(WORK_DIR)+'/OS_specific_files/wmi_TIMEZONE.txt'
+		fobj = open(FILE_TO_READ)
+		for line in fobj:
+			if line.find('Instance:')!=-1:
+				timezone = (line.split('Instance:')[1]).strip()
+
+	except Exception as e:
+		print('Missing timezone file from bundle...')
+
+	return timezone
 
 def configsavailable(WORK_DIR):
 	configs = []
@@ -553,11 +586,51 @@ def dotnetcoreinfo(WORK_DIR):
 		for line in lines:
 			if line.find('Version:')!=-1:
 				dotnetcoreversion = line
+		fobj.close()
 
 	except Exception as e:
 		print('Missing dotnet info file...')
 
 	return dotnetcoreversion.strip()
+
+def processmetrics(WORK_DIR):
+        exceptions = ['java.lang.IllegalArgumentException: Complete time must be >= 0 and >= start time']
+        fatal_msg = 0
+        process_exceptions = {}
+        try:
+            FILE_TO_READ = os.path.abspath(WORK_DIR)+'/mn/log/AGENTRT.txt'
+            fobj = open(FILE_TO_READ)
+            
+            for excp in exceptions:
+                excpcnt = 0
+                for line in fobj:
+                    if line.find(excp)!=-1:
+                        excpcnt+=1
+                        process_exceptions.update({excp:excpcnt})
+
+            fobj.close()
+
+        except Exception as e:
+            print(e)
+
+        return process_exceptions
+
+def rpidprocesses(WORK_DIR):
+        try:
+            processlist = []
+            FILE_TO_READ = os.path.abspath(WORK_DIR)+'/commands/rpictrl_list_all.txt'
+            fobj = open(FILE_TO_READ)
+
+            for line in fobj:
+                if (line.strip()[-2:] == '-r'):
+                    processlist.append(line)
+
+            fobj.close()
+
+        except Exception as e:
+            print('Missing rpictrl details file from bundle...')
+
+        return processlist
 
 def cpustatsplot(WORK_DIR,casenum,cpuplot):
         cpu_values = {}
@@ -691,6 +764,8 @@ def main():
     IP_ADDR = ipaddr(WORK_DIR)
     AGENT_ID = agentid(WORK_DIR)
     TAGS = agenttags(WORK_DIR)
+    OSNAME = agentos(WORK_DIR)
+    TIMEZONE = agenttimezone(WORK_DIR)
     CONFIGS = configsavailable(WORK_DIR)
     ENV_VAR = envvar(WORK_DIR)
     RPICTRL_STATUS = rpictrlstatus(WORK_DIR,UNIX_WIN_FLAG) 
@@ -703,6 +778,8 @@ def main():
     APPTRACES = apptraces(WORK_DIR,UNIX_WIN_FLAG)
     HS_ERR_PID_LOGS = hs_err_pid(WORK_DIR)
     DOTNETCOREINFO = dotnetcoreinfo(WORK_DIR)
+    PROCESS_EXCEPTION = processmetrics(WORK_DIR)
+    RPID_PROCESSES = rpidprocesses(WORK_DIR)
     errorsandwarns(WORK_DIR,errorandwarn)
     cpustatsplot(WORK_DIR,casenum,cpuplot)    
 
@@ -718,6 +795,8 @@ def main():
         fwrite.write('Agent Version: {0}\n'.format(DSA_VER))
         fwrite.write('Agent IID: {0}'.format(AGENT_ID))
         fwrite.write('Analysis Server Host: {0}\n'.format(AS_HOST))
+        fwrite.write('Agent OS: {0}\n'.format(OSNAME))
+        fwrite.write('Agent Timezone: {0}\n'.format(TIMEZONE))
         fwrite.write('Agent Tags:\n')
         for x in range(len(TAGS)):
             fwrite.write('	{0}'.format(TAGS[x]))
@@ -752,7 +831,15 @@ def main():
         fwrite.close()
 
         processdetails(WORK_DIR,filename)
-
+        
+        if len(RPID_PROCESSES)>0:
+            fwrite = open(filename,'a')
+            fwrite.write('\n***** RPIL Injected Processes *****\n')
+            for x in RPID_PROCESSES:
+                fwrite.write(x)
+            fwrite.write('\n')
+            fwrite.close()
+        
         fwrite = open(filename,'a')
         if VALIDATE_DOTNET_INFO_PERMS > 0:
                 fwrite.write('\n****** Validate DotNet Install information *****\n')
@@ -783,6 +870,15 @@ def main():
  
         fwrite.close()
  
+        if len(PROCESS_EXCEPTION)>0:
+            fwrite = open(filename,'a')
+            fwrite.write('\n***** Exceptions in AGENTRT *****\n')
+            for key,value in PROCESS_EXCEPTION.items():
+                fwrite.write('{0} occurred {1} time(s)\n'.format(key,value))
+                if str(key).find('java.lang.IllegalArgumentException: Complete time must be >= 0 and >= start time')!=-1:
+                    fwrite.write('Possible missing process metrics.Check APMDEV-4408\n')
+            fwrite.close()
+        
         fwrite = open(filename,'a')
         fwrite.write('\n***** LAST CONNECTION STATUS *****\n')
         fwrite.write(CONNECTION_STATUS)
